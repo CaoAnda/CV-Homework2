@@ -6,8 +6,8 @@ import  torch.nn.functional as F
 class LeNet(nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        # 1x28x28
-        self.c1 = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5)
+        # 3x28x28
+        self.c1 = nn.Conv2d(in_channels=3, out_channels=6, kernel_size=5)
         # 6x24x24
         self.s2 = nn.AdaptiveAvgPool2d((14, 14))
         # 6x14x14
@@ -19,7 +19,7 @@ class LeNet(nn.Module):
         # upsampling
         self.u1 = nn.UpsamplingBilinear2d(scale_factor=6)
         # 16x30x30
-        self.u2 = nn.Conv2d(in_channels=16, out_channels=10, kernel_size=3)
+        self.u2 = nn.Conv2d(in_channels=16, out_channels=2, kernel_size=3)
         # 10x28x28
         
 

@@ -22,7 +22,7 @@ random.seed(seed)
 
 if __name__ == '__main__':
     train_data = Dataset(mode='train')
-    test_data = Dataset(mode='test')
+    test_data = Dataset(mode='train')
     train_loader = torch.utils.data.DataLoader(train_data, batch_size = opt.batch_size)
     test_loader = torch.utils.data.DataLoader(test_data, batch_size = opt.batch_size)
 
@@ -56,6 +56,7 @@ if __name__ == '__main__':
     for epoch in range(epoch_num):
         model.train()
         for images, labels in tqdm(train_loader, desc='epoch {}'.format(epoch)):
+
             images = images.to(device)
             labels = labels.to(device)
 
@@ -71,23 +72,23 @@ if __name__ == '__main__':
         print('train loss:{}'.format(np.average(train_loss)))
         
         model.eval()
-        # with torch.no_grad():
-        #     correct = 0
-        #     total = 0
-        #     for images, labels in tqdm(test_loader, desc='test'):
-        #         images = images.to(device)
-        #         labels = labels.to(device)
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            for images, labels in tqdm(test_loader, desc='test'):
+                images = images.to(device)
+                labels = labels.to(device)
 
-        #         outputs = model(images)
-        #         loss = criterion(outputs, labels)
-        #         preds = torch.argmax(outputs.data, 1)
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+                preds = torch.argmax(outputs.data, 1)
 
-        #         val_loss.append(loss.item())
-        #         total += labels.size(0)
-        #         correct += (preds == labels).sum().item()
-        #     val_epochs_loss.append(np.average(val_loss))
-        #     val_epochs_acc.append(np.average(correct / total))
-        #     print('loss:{}\tacc:{}%'.format(np.average(val_loss), 100 * correct / total))
+                val_loss.append(loss.item())
+                total += labels.numel()
+                correct += (preds == labels).sum().item()
+            val_epochs_loss.append(np.average(val_loss))
+            val_epochs_acc.append(np.average(correct / total))
+            print('loss:{}\tacc:{}%'.format(np.average(val_loss), 100 * correct / total))
         
         print()
 
