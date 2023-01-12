@@ -25,3 +25,8 @@ http://yann.lecun.com/exdb/mnist/
 Code + Report （不超过1页）
 
 Due: 2023年1月6日
+
+## 使用mask抠图并融合图片
+[python opencv图像叠加/图像融合/mask掩模](https://blog.csdn.net/l641208111/article/details/106202138)
+
+[如何使用python和opencv的mask实现抠图叠加](https://www.yisu.com/zixun/451523.html)
