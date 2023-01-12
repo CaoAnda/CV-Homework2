@@ -49,6 +49,7 @@ class Dataset(data.Dataset):
         # 二值化
         _, mask = cv2.threshold(foreground, 130, 255, cv2.THRESH_BINARY)
         mask_inv = cv2.bitwise_not(mask)
+        # print(foreground.shape, mask.shape)
         # cv2.imshow('mask',mask_inv)
 
         # 使用mask_inv给背景抠图
@@ -63,23 +64,25 @@ class Dataset(data.Dataset):
 
         # 前后景叠加
         blend_image = cv2.add(background, foreground)
+        blend_image = blend_image.reshape(-1, patch_size, patch_size)
         
         label = mask
         label[label==255] = 1
         # cv2.imshow('blend', blend_image)
 
-        return blend_image, label
+        return blend_image.astype(np.float32), label.astype(np.int)
     def __len__(self):
         return len(self.train_dataset)
 
 if __name__ == '__main__':
-    dataset = Dataset()
-    loader = data.DataLoader(dataset, batch_size=1, shuffle=False)
+    dataset = Dataset(mode='test')
+    loader = data.DataLoader(dataset, batch_size=1, shuffle=True)
     iter_loader = iter(loader)
     d = next(iter_loader)
-    d = next(iter_loader)
+    print(d[0].shape, d[1].shape)
+    # d = next(iter_loader)
     cv2.imwrite('he.jpg', np.array(d[0].reshape(28, 28, 3)))
-    cv2.imwrite('label.jpg', np.array(d[1].reshape(28, 28, 1)))
-    # cv2.waitKey()
+    # cv2.imwrite('label.jpg', np.array(d[1].reshape(28, 28, 1)))
+    cv2.waitKey()
     pass
 
