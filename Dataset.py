@@ -6,12 +6,12 @@ from torch.utils import data
 import torchvision
 from torchvision.transforms import transforms
 
-class TrainDataset(data.Dataset):
-    def __init__(self) -> None:
+class Dataset(data.Dataset):
+    def __init__(self, mode) -> None:
         super().__init__()
         self.train_dataset = torchvision.datasets.MNIST(
             root='./',
-            train=True,
+            train= (mode == 'train'),
             # transform=transform,
             download=True
         )
@@ -73,7 +73,7 @@ class TrainDataset(data.Dataset):
         return len(self.train_dataset)
 
 if __name__ == '__main__':
-    dataset = TrainDataset()
+    dataset = Dataset()
     loader = data.DataLoader(dataset, batch_size=1, shuffle=False)
     iter_loader = iter(loader)
     d = next(iter_loader)
