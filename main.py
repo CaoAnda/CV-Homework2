@@ -21,10 +21,10 @@ np.random.seed(seed)
 random.seed(seed)
 
 if __name__ == '__main__':
-    train_data = Dataset(mode='train')
-    test_data = Dataset(mode='test')
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size = opt.batch_size, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(test_data, batch_size = opt.batch_size, shuffle=True)
+    train_data = Dataset(mode='train', num_classes=opt.num_classes)
+    test_data = Dataset(mode='test', num_classes=opt.num_classes)
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size = opt.batch_size, shuffle=True, num_workers=2)
+    test_loader = torch.utils.data.DataLoader(test_data, batch_size = opt.batch_size, shuffle=True, num_workers=2)
 
     device = torch.device(opt.device if torch.cuda.is_available() else 'cpu')
     if torch.cuda.is_available():
@@ -35,7 +35,10 @@ if __name__ == '__main__':
 
     epoch_num = opt.epochs
 
-    model = LeNet().to(device)
+    model = LeNet(
+        num_classes=opt.num_classes,
+        decoding_method=opt.decoding_method
+    ).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr)
@@ -93,7 +96,6 @@ if __name__ == '__main__':
         
         print()
 
-        torch.save(model, 'model.pt')
         plt.figure(figsize=(12,4))
         plt.subplot(121)
         plt.plot(val_epochs_acc, '-s')
@@ -110,3 +112,5 @@ if __name__ == '__main__':
         with open(os.path.join(log_dir, 'log.txt'), 'a+') as file:
             file.write('\t'.join([str(val_epochs_acc[-1]), str(train_epochs_loss[-1]), str(val_epochs_loss[-1])]))
             file.write('\n')
+    torch.save(model, 'model.pt')
+    torch.save(model, os.path.join(log_dir, 'model.pt'))

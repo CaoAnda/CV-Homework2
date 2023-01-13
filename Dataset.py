@@ -7,11 +7,10 @@ from torch.utils import data
 import torchvision
 from torchvision.transforms import transforms
 
-from net import LeNet
-
 class Dataset(data.Dataset):
-    def __init__(self, mode) -> None:
+    def __init__(self, mode, num_classes) -> None:
         super().__init__()
+        self.num_classes = num_classes
         self.train_dataset = torchvision.datasets.MNIST(
             root='./',
             train= (mode == 'train'),
@@ -70,24 +69,33 @@ class Dataset(data.Dataset):
         blend_image = blend_image.reshape(-1, patch_size, patch_size)
         
         label = mask
-        label[label==255] = 1
+        if self.num_classes == 2:
+            label[label==255] = 1
+        elif self.num_classes == 11:
+            label[label==0] = 10
+            label[label==255] = num_label
         # cv2.imshow('blend', blend_image)
 
         return blend_image.astype(np.float32), label.astype(np.int)
     def __len__(self):
         return len(self.train_dataset)
 
+from config import get_args
 if __name__ == '__main__':
-    dataset = Dataset(mode='train')
+    opt = get_args()
+    dataset = Dataset(mode='train', num_classes=opt.num_classes)
     loader = data.DataLoader(dataset, batch_size=1, shuffle=True)
     iter_loader = iter(loader)
     d = next(iter_loader)
 
     model = torch.load('model.pt', map_location='cpu')
+    num_classes = model.num_classes
     outputs = model(d[0])
     preds = torch.argmax(outputs.data, 1)
     # print(preds.sum())
-
-    preds[preds == 1] = 255
+    if num_classes == 2:
+        preds[preds==1] = 255
+    elif num_classes == 11:
+        preds[preds!=10] = 255
     cv2.imwrite('./images/image.jpg', np.array(d[0].reshape(28, 28, 3)))
     cv2.imwrite('./images/pred.jpg', np.array(preds.reshape(28, 28, 1)))
