@@ -7,35 +7,47 @@ class LeNet(nn.Module):
     def __init__(self) -> None:
         super().__init__()
         # 3x28x28
-        self.c1 = nn.Conv2d(in_channels=3, out_channels=6, kernel_size=5)
-        # 6x24x24
-        self.s2 = nn.AdaptiveAvgPool2d((14, 14))
+        self.conv1 = nn.Sequential(     
+            nn.Conv2d(3, 6, kernel_size=5, stride=1, padding=2), 
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2 , stride=2, padding=0)
+        )
+
         # 6x14x14
-        self.c3 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=5)
-        # 16x10x10
-        self.s4 = nn.AdaptiveAvgPool2d((5, 5))
+        self.conv2 = nn.Sequential(
+            nn.Conv2d(6, 64, kernel_size=5, stride=1, padding=0), #input_size=(6*14*14)，output_size=16*10*10
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0)    ##input_size=(16*10*10)，output_size=(16*5*5)
+        )
         # 16x5x5
 
         # upsampling
-        self.u1 = nn.UpsamplingBilinear2d(scale_factor=6)
-        # 16x30x30
-        self.u2 = nn.Conv2d(in_channels=16, out_channels=2, kernel_size=3)
-        # 10x28x28
+        self.upsamp = nn.Sequential(
+            nn.Upsample(scale_factor=6),
+            nn.Conv2d(in_channels=64, out_channels=2, kernel_size=3),
+            nn.ReLU(),
+        )
+        # deconv
+        self.deconv = nn.Sequential(
+            # TODO:finish deconv
+            nn.ConvTranspose2d(16, 32, kernel_size=),
+            nn.Conv2d(in_channels=64, out_channels=2, kernel_size=3),
+            nn.ReLU(),
+        )
+        # 2x28x28
         
 
     def forward(self, x):
-        out = F.relu(self.c1(x))
-        out = F.relu(self.s2(out))
-        out = F.relu(self.c3(out))
-        out = F.relu(self.s4(out))
-
-        out = F.relu(self.u1(out))
-        out = F.relu(self.u2(out))
+        out = self.conv1(x)
+        out = self.conv2(out)
+        out = self.upsamp(out)
 
         return out
 
 if __name__ == '__main__':
-    input = torch.randn((1, 1, 28, 28))
+    input = torch.randn((1, 3, 28, 28))
+    # print(input.numel())
     model = LeNet()
+
     out = model(input)
     print(out.shape)
