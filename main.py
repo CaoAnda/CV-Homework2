@@ -22,9 +22,9 @@ random.seed(seed)
 
 if __name__ == '__main__':
     train_data = Dataset(mode='train')
-    test_data = Dataset(mode='train')
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size = opt.batch_size)
-    test_loader = torch.utils.data.DataLoader(test_data, batch_size = opt.batch_size)
+    test_data = Dataset(mode='test')
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size = opt.batch_size, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(test_data, batch_size = opt.batch_size, shuffle=True)
 
     device = torch.device(opt.device if torch.cuda.is_available() else 'cpu')
     if torch.cuda.is_available():
@@ -40,8 +40,6 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr)
 
-    train_loss = []
-    val_loss = []
     train_epochs_loss = []
     val_epochs_loss = []
     val_epochs_acc = []
@@ -54,6 +52,8 @@ if __name__ == '__main__':
         json.dump(opt.__dict__, file, indent=4)
 
     for epoch in range(epoch_num):
+        train_loss = []
+        val_loss = []
         model.train()
         for images, labels in tqdm(train_loader, desc='epoch {}'.format(epoch)):
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
             outputs = model(images)
             loss = criterion(outputs, labels)
-
+            # print(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -81,6 +81,7 @@ if __name__ == '__main__':
 
                 outputs = model(images)
                 loss = criterion(outputs, labels)
+                # print(loss.item())
                 preds = torch.argmax(outputs.data, 1)
 
                 val_loss.append(loss.item())
@@ -92,6 +93,7 @@ if __name__ == '__main__':
         
         print()
 
+        torch.save(model, 'model.pt')
         plt.figure(figsize=(12,4))
         plt.subplot(121)
         plt.plot(val_epochs_acc, '-s')
