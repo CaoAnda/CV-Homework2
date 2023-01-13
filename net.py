@@ -8,18 +8,18 @@ class LeNet(nn.Module):
         super().__init__()
         # 3x28x28
         self.conv1 = nn.Sequential(     
-            nn.Conv2d(3, 6, kernel_size=5, stride=1, padding=2), 
+            nn.Conv2d(3, 6, kernel_size=5, padding=2),  # 3x28x28
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2 , stride=2, padding=0)
+            nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
         # 6x14x14
         self.conv2 = nn.Sequential(
-            nn.Conv2d(6, 64, kernel_size=5, stride=1, padding=0), #input_size=(6*14*14)，output_size=16*10*10
+            nn.Conv2d(6, 64, kernel_size=5),    # 64x10x10
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0)    ##input_size=(16*10*10)，output_size=(16*5*5)
+            nn.MaxPool2d(kernel_size=2, stride=2)
         )
-        # 16x5x5
+        # 64x5x5
 
         # upsampling
         self.upsamp = nn.Sequential(
@@ -27,11 +27,17 @@ class LeNet(nn.Module):
             nn.Conv2d(in_channels=64, out_channels=2, kernel_size=3),
             nn.ReLU(),
         )
+
         # deconv
         self.deconv = nn.Sequential(
             # TODO:finish deconv
-            nn.ConvTranspose2d(16, 32, kernel_size=),
-            nn.Conv2d(in_channels=64, out_channels=2, kernel_size=3),
+            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2), # 32x11x11
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 32, kernel_size=5, stride=2), # 32x25x25
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 32, kernel_size=5), # 32x29x29
+            nn.ReLU(),
+            nn.Conv2d(in_channels=32, out_channels=2, kernel_size=2),
             nn.ReLU(),
         )
         # 2x28x28
@@ -40,7 +46,8 @@ class LeNet(nn.Module):
     def forward(self, x):
         out = self.conv1(x)
         out = self.conv2(out)
-        out = self.upsamp(out)
+        # out = self.upsamp(out)
+        out = self.deconv(out)
 
         return out
 
