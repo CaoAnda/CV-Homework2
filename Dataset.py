@@ -96,6 +96,8 @@ if __name__ == '__main__':
     if num_classes == 2:
         preds[preds==1] = 255
     elif num_classes == 11:
-        preds[preds!=10] = 255
+        preds[preds==10] = -1
+        preds[preds==d[1]] = 255
+        preds[preds==-1] = 0
     cv2.imwrite('./images/image.jpg', np.array(d[0].reshape(28, 28, 3)))
     cv2.imwrite('./images/pred.jpg', np.array(preds.reshape(28, 28, 1)))
