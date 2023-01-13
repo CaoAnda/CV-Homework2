@@ -82,17 +82,12 @@ if __name__ == '__main__':
     loader = data.DataLoader(dataset, batch_size=1, shuffle=True)
     iter_loader = iter(loader)
     d = next(iter_loader)
-    # print(d[0].shape, d[1].shape)
-    # d = next(iter_loader)
-    # cv2.imwrite('image.jpg', np.array(d[0].reshape(28, 28, 3)))
-    # cv2.imwrite('label.jpg', np.array(d[1].reshape(28, 28, 1)))
-    # cv2.waitKey()
+
     model = torch.load('model.pt', map_location='cpu')
     outputs = model(d[0])
     preds = torch.argmax(outputs.data, 1)
     # print(preds.sum())
+
     preds[preds == 1] = 255
     cv2.imwrite('./images/image.jpg', np.array(d[0].reshape(28, 28, 3)))
     cv2.imwrite('./images/pred.jpg', np.array(preds.reshape(28, 28, 1)))
-    pass
-

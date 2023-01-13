@@ -23,8 +23,14 @@ class LeNet(nn.Module):
 
         # upsampling
         self.upsamp = nn.Sequential(
-            nn.Upsample(scale_factor=6),
-            nn.Conv2d(in_channels=64, out_channels=2, kernel_size=3),
+            nn.Upsample(scale_factor=2, mode='bilinear'),   # 64x10x10
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3),  # 64x8x8
+            nn.ReLU(),
+            nn.Upsample(scale_factor=2, mode='bilinear'),   # 64x16x16
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3),  # 64x14x14
+            nn.ReLU(),
+            nn.Upsample(scale_factor=2, mode='bilinear'),   # 64x28x28
+            nn.Conv2d(in_channels=64, out_channels=2, kernel_size=1),
             nn.ReLU(),
         )
 
@@ -46,8 +52,8 @@ class LeNet(nn.Module):
     def forward(self, x):
         out = self.conv1(x)
         out = self.conv2(out)
-        # out = self.upsamp(out)
-        out = self.deconv(out)
+        out = self.upsamp(out)
+        # out = self.deconv(out)
 
         return out
 
