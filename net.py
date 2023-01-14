@@ -1,13 +1,12 @@
 from torch import nn
 import torch
-import  torch.nn.functional as F
-
 
 class LeNet(nn.Module):
     def __init__(self, num_classes, decoding_method) -> None:
         super().__init__()
         self.num_classes = num_classes
         self.decoding_method = decoding_method
+        
         # 3x28x28
         self.conv1 = nn.Sequential(     
             nn.Conv2d(3, 6, kernel_size=5, padding=2),  # 3x28x28

@@ -48,7 +48,6 @@ class Dataset(data.Dataset):
         # 二值化
         _, mask = cv2.threshold(foreground, 130, 255, cv2.THRESH_BINARY)
         mask_inv = cv2.bitwise_not(mask)
-        # print(foreground.shape, mask.shape)
         # cv2.imshow('mask',mask_inv)
 
         # 使用mask_inv给背景抠图
@@ -71,7 +70,6 @@ class Dataset(data.Dataset):
         elif self.num_classes == 11:
             label[label==0] = 10
             label[label==255] = num_label
-        # cv2.imshow('blend', blend_image)
 
         return blend_image.astype(np.float32), label.astype(np.int)
     def __len__(self):
@@ -89,6 +87,7 @@ if __name__ == '__main__':
     num_classes = model.num_classes
     outputs = model(d[0])
     preds = torch.argmax(outputs.data, 1)
+    
     # print(preds.sum())
     if num_classes == 2:
         preds[preds==1] = 255
