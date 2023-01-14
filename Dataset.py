@@ -5,7 +5,6 @@ import numpy as np
 import torch
 from torch.utils import data
 import torchvision
-from torchvision.transforms import transforms
 
 class Dataset(data.Dataset):
     def __init__(self, mode, num_classes) -> None:
@@ -14,12 +13,10 @@ class Dataset(data.Dataset):
         self.train_dataset = torchvision.datasets.MNIST(
             root='./',
             train= (mode == 'train'),
-            # transform=transform,
             download=True
         )
         self.backgroundImages = self.__init_background_images__('./net-images')
         self.patch_size = 28
-        # self.toTensor = transforms.ToTensor()
         
     # 初始化背景图像列表
     def __init_background_images__(self, root):

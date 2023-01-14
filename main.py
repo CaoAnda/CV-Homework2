@@ -84,7 +84,6 @@ if __name__ == '__main__':
 
                 outputs = model(images)
                 loss = criterion(outputs, labels)
-                # print(loss.item())
                 preds = torch.argmax(outputs.data, 1)
 
                 val_loss.append(loss.item())
